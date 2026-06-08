@@ -6,7 +6,7 @@
 |-------|-------|
 | Product | Sales Enablement & Meeting Automation Crew |
 | Use Case | Use Case 3 — Maven Agentic AI Architect Capstone (Lesson 4) |
-| Version | 1.0 |
+| Version | 1.1 |
 | Selected Runtime | `crewai` (`AAMAD_TARGET_RUNTIME=crewai`) |
 | Input Artifacts | `mrd.md`, `MRD-v2.md` |
 | Output Path | `project-context/1.define/prd-v1.md` |
@@ -39,18 +39,31 @@ The **Sales Enablement & Meeting Automation Crew** is a CrewAI multi-agent syste
 | Salesforce Agentforce | CRM-native agents | Salesforce-ecosystem bound |
 | Custom ChatGPT | Ad hoc assistance | No persistent deal context or structured handoffs |
 
-**Expected outcomes (MVP — leading indicators):**
+**Expected outcomes — business KPIs per AE (post-pilot, research-backed targets):**
+
+| KPI | Research benchmark | Product target (per AE, 12 mo) |
+|-----|-------------------|-------------------------------|
+| Revenue per AE | +41% ($1.75M vs $1.24M) — Optifai, N=938 | **+15–25%** (conservative vs. benchmark) |
+| Deals closed per AE / quarter | +53% productivity → ~15→23 deals/mo — Optifai | **+10–20%** closed-won deals |
+| Win rate | +25% (course); 42% more likely — Highspot | **+10–15%** absolute or relative improvement |
+| Sales cycle / time to close | ↓28% cycle — Optifai; ↓32% — Salesforce | **↓15–25%** days to close |
+| Quota attainment | Top performers 3.5× more proactive — Careertrainer | **+10%** reps at ≥100% quota |
+
+**Expected outcomes — MVP leading indicators (capstone / 90-day pilot):**
 
 - Prep time per meeting ↓ **80%+**
 - Time-to-follow-up ↓ from **24–48 hrs → <1 hr**
-- CRM draft completeness ↑ **measurable field coverage**
+- Meeting-to-next-step conversion ↑ **≥15%** (deals advancing within 7 days of meeting)
+- CRM draft completeness ↑ **≥90%** required fields populated
 - Rep-reported confidence before meetings ↑ (qualitative)
+
+Leading indicators above are **proxies** for revenue and deal closure KPIs; pilot must measure both layers (see Section 7).
 
 ### Strategic Rationale
 
 **Why multi-agent:** Sales workflows naturally decompose into specialist roles with handoffs (research → brief → summary → follow-up). A single monolithic agent cannot enforce least-privilege tools, parallel research, or human approval gates per step. CrewAI **hierarchical process**, **Flows**, and **shared memory** map directly to this domain (MRD-v2, `mrd.md` Dimension 2).
 
-**Business case:** AI-augmented reps achieve **+41% revenue/rep** with **18% fewer activities** (Optifai, N=938); organizations using GTM AI report **+29% revenue growth** (Gong 2025). MVP measures attributable leading indicators before claiming revenue lift.
+**Business case:** AI-augmented reps achieve **+41% revenue/rep** with **18% fewer activities** (Optifai, N=938); organizations using GTM AI report **+29% revenue growth** (Gong 2025). The product must ultimately move **revenue, deals closed, and win rate per AE**—not only efficiency metrics. MVP proves the workflow; pilot measures the revenue KPI cascade in Section 7.
 
 **Market timing:** Buyer-side AI adoption (**94%** of B2B buyers use AI in buying — Forrester 2025) increases urgency for seller-side AI orchestration.
 
@@ -414,22 +427,62 @@ Traceability: MRD-v2 P0 #1–7
 
 ## 7. Success Metrics & KPIs
 
-### Business Metrics (Leading — MVP)
+### Revenue & Deal Outcomes per AE (Primary Business KPIs)
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Prep time per meeting | ↓ 80% vs. manual baseline | Self-reported + workflow timestamps |
-| Time to follow-up draft | < 15 min post-meeting | Workflow timestamps |
-| Brief completeness score | ≥ 90% required fields populated | Automated schema validation |
-| Rep approval rate of drafts | ≥ 70% approved with minor edits | Approval UI events |
+These are the **north-star business metrics** the product must influence. Targets are per quota-carrying AE unless noted as team-level.
 
-### Business Metrics (Lagging — Post-pilot)
+| KPI | Definition | Research benchmark | 90-day pilot target | 12-month target (per AE) |
+|-----|------------|-------------------|---------------------|--------------------------|
+| **Revenue per AE** | Closed-won revenue attributed to AE | +41% ($1.75M vs $1.24M) — Optifai, N=938 | **+5–10%** vs. pre-pilot baseline | **+15–25%** |
+| **Deals closed per AE** | Count of closed-won opportunities per quarter | ~15→23 deals/mo with AI (+53% productivity) — Optifai | **+5–10%** deals closed | **+10–20%** deals closed |
+| **Win rate** | Closed-won ÷ (closed-won + closed-lost) | +25% improvement (course); 42% more likely — Highspot | **+5%** absolute improvement | **+10–15%** relative improvement |
+| **Sales cycle length** | Days from opportunity create → closed-won | ↓28% — Optifai; ↓32% — Salesforce; ↓45 days enterprise (course, segment-dependent) | **↓10%** median days to close | **↓15–25%** median days to close |
+| **Deal velocity** | (Opportunities × avg deal size × win rate) ÷ cycle days | B2B SaaS median ~$8,200/day pipeline velocity — Optifai | **+10%** velocity | **+20–28%** velocity |
+| **Average deal size** | Mean closed-won ACV | +50% avg deal ($72K vs $48K) — Optifai AI-augmented | Hold or **+5%** | **+10–15%** |
+| **Quota attainment** | % of AE at ≥100% quota | Mature enablement 4:1 ROI — SiftHub | **+10%** of team at quota | **+15–20%** of team at quota |
+| **Team revenue growth** | Org-level GTM revenue YoY | +29% vs peers — Gong 2025 | Directionally positive | **+10–20%** (team, with attribution controls) |
 
-| Metric | Benchmark source |
-|--------|------------------|
-| Win rate improvement | Highspot: 42% more likely with unified enablement |
-| Revenue per rep | Optifai: +41% AI-augmented |
-| Sales cycle reduction | 15–30% range (multiple sources) |
+**Measurement requirements:**
+
+- Establish **90-day pre-pilot baseline** per AE: revenue, deals closed, win rate, avg cycle days, pipeline velocity
+- Use **control group or staggered rollout** where possible (5–10 AEs treatment vs. matched cohort)
+- Attribute revenue to crew usage via CRM: meetings prepped/followed-up through system vs. not
+- Report KPIs **monthly per AE** and rolled up at team level for CRO/RevOps review
+
+### KPI Cascade (Leading → Lagging)
+
+```
+Efficiency (MVP)                    Deal motion (Pilot)              Revenue (12 mo)
+─────────────────                   ───────────────────              ────────────────
+Prep time ↓ 80%          ──►        Meeting→next step ↑ 15%  ──►   Deals closed/AE ↑ 10–20%
+Follow-up < 1 hr         ──►        Win rate ↑ 5–10%       ──►   Win rate ↑ 10–15%
+CRM completeness ↑ 90%   ──►        Cycle days ↓ 10–25%    ──►   Revenue/AE ↑ 15–25%
+Selling time reinvested  ──►        Pipeline velocity ↑    ──►   Quota attainment ↑
+```
+
+### Business Metrics (Leading — MVP / 90-Day Pilot)
+
+| Metric | Target | Measurement | Links to revenue KPI |
+|--------|--------|-------------|----------------------|
+| Prep time per meeting | ↓ 80% vs. manual baseline | Workflow timestamps + self-report | More meetings run well → win rate ↑ |
+| Time to follow-up draft | < 15 min post-meeting | Workflow timestamps | Faster follow-up → deal velocity ↑ |
+| Meeting-to-next-step conversion | ↑ ≥ 15% within 7 days | CRM stage change after crew-tagged meeting | Deals advance → closure rate ↑ |
+| Brief completeness score | ≥ 90% required fields | Schema validation | Better prep → win rate ↑ |
+| Rep approval rate of drafts | ≥ 70% approved with minor edits | Approval UI events | Adoption → KPI cascade activates |
+| Selling time reinvested | ↑ ≥ 5 hrs/week per AE | Time study or self-report | Capacity for more deals → deals closed ↑ |
+
+### Business Metrics (Lagging — Pilot & Production)
+
+| Metric | Pilot target (90 days) | 12-month target | Benchmark source |
+|--------|------------------------|-----------------|------------------|
+| Revenue per AE | +5–10% | +15–25% | Optifai +41%; Gong +29% org growth |
+| Deals closed per AE | +5–10% | +10–20% | Optifai 15→23 deals/mo |
+| Win rate | +5% absolute | +10–15% relative | Highspot 42% more likely |
+| Sales cycle reduction | ↓10% | ↓15–25% | Optifai 28%; Salesforce 32% |
+| Deal velocity | +10% | +20–28% | Optifai pipeline velocity data |
+| ROI on enablement spend | Break-even path documented | **4:1** enablement ROI | SiftHub mature programs |
+
+**Honest attribution note (from `mrd.md`):** Only ~5% of enterprises reliably measure AI ROI today (IBM, 2026). This product must instrument the KPI cascade above from day one of pilot—not rely on efficiency metrics alone.
 
 ### Technical Metrics
 
@@ -506,9 +559,10 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 ### Beta Testing Plan (Post-capstone path)
 
 - **Segment:** 3–5 mid-market SaaS teams with HubSpot + Google Calendar
-- **Duration:** 4 weeks
-- **Success:** ≥ 70% weekly active reps; prep time reduction validated
-- **Feedback:** Weekly rep interviews + approval rate analytics
+- **Duration:** 90 days (minimum for revenue KPI measurement)
+- **Success — leading:** ≥ 70% weekly active reps; prep time ↓ 80%; follow-up < 1 hr
+- **Success — business (per AE):** Revenue +5–10%; deals closed +5–10%; win rate +5%; cycle ↓10%
+- **Feedback:** Weekly rep interviews + monthly KPI dashboard for RevOps/CRO
 
 ### Market Launch Strategy
 
@@ -522,8 +576,8 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 | Milestone | Criteria |
 |-----------|----------|
 | Capstone demo | Full P0 loop live in ≤ 6 weeks |
-| Beta | 3 design partners onboarded |
-| GA readiness | CRM write with approval; SOC 2 roadmap documented |
+| Beta (90 days) | 3 design partners; per-AE KPI baseline + **+5% revenue or deals closed** measured |
+| GA readiness | CRM write with approval; SOC 2 roadmap; **12-month KPI targets** instrumented in product analytics |
 
 ---
 
@@ -602,7 +656,7 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 |-------|-------|
 | Timestamp | 2025-06-07T00:00:00Z |
 | Persona | @product-mgr |
-| Action | create-prd |
+| Action | create-prd → update-v1.1-revenue-kpis |
 | Template | `.cursor/templates/prd-template.md` |
 | Input | `project-context/1.define/MRD-v2.md`, `mrd.md` |
 | Output Path | `project-context/1.define/prd-v1.md` |
