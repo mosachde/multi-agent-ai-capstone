@@ -9,7 +9,7 @@
 | Version | 1.0 |
 | Selected Runtime | `crewai` (`AAMAD_TARGET_RUNTIME=crewai`) |
 | Input Artifacts | `mrd.md`, `MRD-v2.md` |
-| Output Path | `project-context/1.define/prd.md` |
+| Output Path | `project-context/1.define/prd-v1.md` |
 | Primary Persona | Mid-market B2B SaaS Account Executive |
 
 ---
@@ -605,7 +605,7 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 | Action | create-prd |
 | Template | `.cursor/templates/prd-template.md` |
 | Input | `project-context/1.define/MRD-v2.md`, `mrd.md` |
-| Output Path | `project-context/1.define/prd.md` |
+| Output Path | `project-context/1.define/prd-v1.md` |
 | Runtime | crewai |
 | Model | Claude (Cursor Agent) |
 | Temperature | Low (deterministic artifact generation) |
