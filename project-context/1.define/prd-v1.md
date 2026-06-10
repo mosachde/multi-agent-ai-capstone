@@ -6,7 +6,7 @@
 |-------|-------|
 | Product | Sales Enablement & Meeting Automation Crew |
 | Use Case | Use Case 3 — Maven Agentic AI Architect Capstone (Lesson 4) |
-| Version | 1.4 |
+| Version | 1.6 |
 | Target CRM | HubSpot (confirmed — see Decisions D1) |
 | Selected Runtime | `crewai` (`AAMAD_TARGET_RUNTIME=crewai`) |
 | Input Artifacts | `mrd.md`, `MRD-v2.md` |
@@ -419,7 +419,22 @@ Traceability: MRD-v2 P0 #1–7
   - Reads calendar events within configurable window (default T-60 min)
   - Auto-starts FR-P0-02 through FR-P0-04 pipeline
   - Rep notified when brief is ready
+  - Auto-trigger is **opt-in via Settings** (FR-P0-09); manual trigger remains the default and always available
 - **MRD trace:** P0 #1
+
+---
+
+**FR-P0-09: User Settings Panel**
+
+- **User story:** As an AE, I want a settings area in the chat app so that I can control how workflows are triggered and which tools are connected.
+- **Acceptance criteria:**
+  - **Trigger mode:** Manual (default) | Automatic via calendar — automatic selectable only once a calendar is connected (Sprint 3)
+  - **Trigger window:** configurable lead time for auto-prep (default T-60 min)
+  - **Integrations:** connect/disconnect CRM and calendar; show connection status
+  - Settings persist per user across sessions
+  - Sprint 1 scope: trigger mode shown with Automatic visible but disabled ("requires calendar connection") to set forward expectations
+- **Dependencies:** FR-P0-01 (manual default), FR-P0-08 (automatic mode)
+- **MRD trace:** Supports P0 #1 rollout; UX requirement from Decisions D3
 
 ---
 
@@ -480,6 +495,7 @@ Traceability: MRD-v2 P0 #1–7
 - **Structured output cards:** Pre-meeting brief | Post-meeting summary | Email draft | CRM draft
 - **Approval buttons:** Approve / Edit / Reject for competitive claims, email, CRM draft
 - **Status indicator:** Workflow progress (researching → briefing → ready)
+- **Settings panel (FR-P0-09):** trigger mode (manual default / automatic via calendar), trigger window, integration connections and status
 - **Mobile:** Not required for capstone MVP
 
 ### Agent Interaction Design
@@ -734,6 +750,23 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 
 - HubSpot mid-market predominantly runs Google Workspace; FR-P0-08 targets Google Calendar. MS Graph/Outlook deferred to post-MVP.
 
+**D3 — Manual trigger confirmed for Sprint 1; trigger mode becomes a user setting (confirmed 2026-06-09).**
+
+- **Decision:** Sprint 1 demo acceptance uses the manual trigger (FR-P0-01) — rep supplies meeting context via chat. Calendar auto-trigger (FR-P0-08) arrives in Sprint 3 as an **opt-in setting**, not a forced behavior change.
+- **Rationale:** Zero integration/OAuth work needed for the first working demo; the core value loop (brief → summary → email + CRM drafts) is provable with typed input and mock data.
+- **Cascading implication:** The chat app requires a **Settings panel (FR-P0-09)** from Sprint 1 — trigger mode (manual default / automatic), trigger window, and integration connection management — so the manual→automatic transition is a user choice, not a redeploy.
+
+**D4 — Web app for MVP and pilot; native desktop deferred (confirmed 2026-06-09).**
+
+- **Decision:** The MVP and 90-day pilot ship as a **browser-based web app**. A native Mac/Windows desktop app was considered and deferred.
+- **Rationale:**
+  - Native packaging (two OS targets, code signing/notarization, installers, auto-update) roughly doubles ship cost with zero workflow value for a 6-week capstone.
+  - Web app minimizes pilot friction: reps onboard via a URL; desktop installers risk IT/MDM blockers at pilot companies.
+  - Continuous deployment during pilot — all users always on the latest version while iterating on feedback.
+  - Rep workflow (HubSpot, Gmail, LinkedIn) is browser-based; the app sits beside the tools reps copy outputs into.
+- **Desktop-presence mitigations in the web app:** browser push notifications and/or Slack notification for "brief ready" (supports the FR-P0-08 auto-trigger moment).
+- **Demand gate for revisit:** if ≥2 pilot teams request desktop presence, ship a Tauri/Electron wrapper around the same web app (the headless crew backend and API are surface-agnostic, so no orchestration rework).
+
 ---
 
 ## Assumptions
@@ -751,7 +784,7 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 ## Open Questions
 
 1. ~~Confirm HubSpot vs. Salesforce as primary CRM for capstone build.~~ **Resolved — see Decisions D1 (HubSpot confirmed).**
-2. Confirm manual trigger sufficient for Sprint 1 demo acceptance.
+2. ~~Confirm manual trigger sufficient for Sprint 1 demo acceptance.~~ **Resolved — see Decisions D3 (manual trigger confirmed; trigger mode exposed as user setting via FR-P0-09).**
 3. Minimum HubSpot fields for CRM draft schema (deal stage, next step, close date — confirm with stakeholder).
 4. Should capstone demo use synthetic account data exclusively, or connect to live sandbox?
 5. LLM provider preference (OpenAI vs. Anthropic) for `manager_llm` and specialist agents?
@@ -762,9 +795,9 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-06-09T22:44:00-05:00 |
+| Timestamp | 2026-06-09T22:56:00-05:00 |
 | Persona | @product-mgr |
-| Action | create-prd → update-v1.1-revenue-kpis → update-v1.2-application-diagram-overview → update-v1.3-standalone-deployment-model → update-v1.4-hubspot-first-decision |
+| Action | create-prd → update-v1.1-revenue-kpis → update-v1.2-application-diagram-overview → update-v1.3-standalone-deployment-model → update-v1.4-hubspot-first-decision → update-v1.5-manual-trigger-decision-settings-fr → update-v1.6-webapp-decision |
 | Template | `.cursor/templates/prd-template.md` |
 | Input | `project-context/1.define/MRD-v2.md`, `mrd.md` |
 | Output Path | `project-context/1.define/prd-v1.md` |
