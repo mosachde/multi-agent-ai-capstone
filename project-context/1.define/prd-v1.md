@@ -6,7 +6,7 @@
 |-------|-------|
 | Product | Sales Enablement & Meeting Automation Crew |
 | Use Case | Use Case 3 — Maven Agentic AI Architect Capstone (Lesson 4) |
-| Version | 1.1 |
+| Version | 1.2 |
 | Selected Runtime | `crewai` (`AAMAD_TARGET_RUNTIME=crewai`) |
 | Input Artifacts | `mrd.md`, `MRD-v2.md` |
 | Output Path | `project-context/1.define/prd-v1.md` |
@@ -423,6 +423,68 @@ Traceability: MRD-v2 P0 #1–7
 | Error handling | Graceful fallback if enrichment API unavailable |
 | Human-in-the-loop | Mandatory approval before customer-facing or CRM commit actions |
 
+### Application Diagram Overview
+
+The product is a **new, standalone web application** with a chat-first UI — not a CRM plugin. Existing tools (HubSpot, calendar, web/enrichment, battlecard KB) are **read-only data sources** in the MVP. The AE copies approved outputs back into email and CRM manually until approve-and-commit writes ship in Phase 3.
+
+**System overview:**
+
+```mermaid
+flowchart TB
+    subgraph USER["AE's Experience (what the rep sees)"]
+        UI["Standalone Web App — Chat UI<br/>(new system, own browser tab)"]
+        CARDS["Output Cards:<br/>Pre-meeting Brief | Post-meeting Summary<br/>Email Draft | CRM Draft"]
+        APPROVE["Approve / Edit / Reject buttons"]
+        UI --> CARDS --> APPROVE
+    end
+
+    subgraph CREW["CrewAI Backend (invisible to user)"]
+        SM["Sales Manager Agent<br/>(coordinator)"]
+        PR["Prospect<br/>Research"]
+        CI["Competitive<br/>Intel"]
+        MP["Meeting<br/>Prep"]
+        MI["Meeting<br/>Insights"]
+        FU["Follow-Up"]
+        SM --> PR
+        SM --> CI
+        SM --> MP
+        SM --> MI
+        SM --> FU
+    end
+
+    subgraph TOOLS["Existing Tools (read-only in MVP)"]
+        CRM["HubSpot CRM<br/>contacts, deals, history"]
+        CAL["Google Calendar<br/>upcoming meetings"]
+        WEB["Web Search /<br/>Enrichment"]
+        KB["Battlecard<br/>Knowledge Base"]
+    end
+
+    UI -->|"trigger: 'prep me for 2pm with Acme'"| SM
+    PR -.reads.-> CRM
+    PR -.reads.-> WEB
+    CI -.reads.-> KB
+    CI -.reads.-> WEB
+    SM -.reads.-> CAL
+    FU -.reads.-> CRM
+
+    APPROVE -->|"AE copies approved email & CRM note<br/>back into their tools manually (MVP)"| CRM
+```
+
+**Meeting lifecycle flow (single meeting):**
+
+```mermaid
+flowchart LR
+    A["AE triggers prep<br/>(chat or auto via calendar)"] --> B["Agents research<br/>~3 min"]
+    B --> C["Brief card<br/>AE reads it"]
+    C --> D["Meeting happens<br/>(human-run, no AI)"]
+    D --> E["AE pastes<br/>transcript/notes"]
+    E --> F["Agents synthesize<br/>~2 min"]
+    F --> G["Summary + Email draft<br/>+ CRM draft cards"]
+    G --> H["AE approves →<br/>copies into email & HubSpot"]
+```
+
+Traceability: UI elements map to Section 6 Interface Requirements; agent topology maps to Section 3 Orchestration Pattern; read-only integration boundary maps to FR-P0-07 and Section 5 Security (no silent CRM writes).
+
 ---
 
 ## 7. Success Metrics & KPIs
@@ -654,9 +716,9 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2025-06-07T00:00:00Z |
+| Timestamp | 2026-06-09T22:29:00-05:00 |
 | Persona | @product-mgr |
-| Action | create-prd → update-v1.1-revenue-kpis |
+| Action | create-prd → update-v1.1-revenue-kpis → update-v1.2-application-diagram-overview |
 | Template | `.cursor/templates/prd-template.md` |
 | Input | `project-context/1.define/MRD-v2.md`, `mrd.md` |
 | Output Path | `project-context/1.define/prd-v1.md` |
