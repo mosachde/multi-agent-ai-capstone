@@ -6,7 +6,8 @@
 |-------|-------|
 | Product | Sales Enablement & Meeting Automation Crew |
 | Use Case | Use Case 3 — Maven Agentic AI Architect Capstone (Lesson 4) |
-| Version | 1.2 |
+| Version | 1.4 |
+| Target CRM | HubSpot (confirmed — see Decisions D1) |
 | Selected Runtime | `crewai` (`AAMAD_TARGET_RUNTIME=crewai`) |
 | Input Artifacts | `mrd.md`, `MRD-v2.md` |
 | Output Path | `project-context/1.define/prd-v1.md` |
@@ -29,6 +30,72 @@ Existing tools solve fragments of this problem (Gong for conversation intelligen
 The **Sales Enablement & Meeting Automation Crew** is a CrewAI multi-agent system that coordinates specialized agents—Prospect Research, Competitive Intelligence, Meeting Prep, Meeting Insights, and Follow-Up—under a **Sales Manager coordinator agent**.
 
 **Unique value proposition:** Orchestrates the full meeting lifecycle in one crew with shared context, rather than competing as another point solution.
+
+#### Deployment Model: Standalone Application (Not a CRM Plugin)
+
+The product ships as a **new, standalone web application** with a chat-first UI — it is **not** embedded inside HubSpot or Salesforce. Existing tools (CRM, calendar, web/enrichment, battlecard KB) are connected as **read-only data sources** in the MVP; the AE reviews and approves all outputs before anything reaches a customer or the CRM.
+
+**Application overview:**
+
+```mermaid
+flowchart TB
+    subgraph USER["AE's Experience (what the rep sees)"]
+        UI["Standalone Web App — Chat UI<br/>(new system, own browser tab)"]
+        CARDS["Output Cards:<br/>Pre-meeting Brief | Post-meeting Summary<br/>Email Draft | CRM Draft"]
+        APPROVE["Approve / Edit / Reject buttons"]
+        UI --> CARDS --> APPROVE
+    end
+
+    subgraph CREW["CrewAI Backend (invisible to user)"]
+        SM["Sales Manager Agent<br/>(coordinator)"]
+        PR["Prospect<br/>Research"]
+        CI["Competitive<br/>Intel"]
+        MP["Meeting<br/>Prep"]
+        MI["Meeting<br/>Insights"]
+        FU["Follow-Up"]
+        SM --> PR
+        SM --> CI
+        SM --> MP
+        SM --> MI
+        SM --> FU
+    end
+
+    subgraph TOOLS["Existing Tools (read-only in MVP)"]
+        CRM["HubSpot CRM<br/>contacts, deals, history"]
+        CAL["Google Calendar<br/>upcoming meetings"]
+        WEB["Web Search /<br/>Enrichment"]
+        KB["Battlecard<br/>Knowledge Base"]
+    end
+
+    UI -->|"trigger: 'prep me for 2pm with Acme'"| SM
+    PR -.reads.-> CRM
+    PR -.reads.-> WEB
+    CI -.reads.-> KB
+    CI -.reads.-> WEB
+    SM -.reads.-> CAL
+    FU -.reads.-> CRM
+
+    APPROVE -->|"AE copies approved email & CRM note<br/>back into their tools manually (MVP)"| CRM
+```
+
+**Why standalone rather than CRM-native:**
+
+1. **The workflow lives outside the CRM.** The meeting lifecycle spans calendar, web research, battlecards, notes, and email — reps avoid the CRM (that is the root problem this product addresses). A CRM-native agent places AI where reps don't work; the standalone app sits at the workflow's natural center: the meeting.
+2. **Cross-tool orchestration is the differentiation.** The stated wedge — "orchestration layer, not another point solution" — only exists outside any single vendor's walls. CRM-native agents (e.g., Agentforce) are structurally biased toward their own platform's data and ecosystem.
+3. **CRM-agnostic market position.** A standalone layer sells into HubSpot shops, Salesforce shops, and mixed stacks with one product, and avoids platform hostage risk (marketplace review cycles, revenue share, platform roadmap cloning the feature).
+4. **Capstone/MVP velocity.** A standalone app demos the full P0 loop without CRM app-marketplace approval, with free choice of LLM provider and agent framework.
+5. **Defensible asset.** Persistent cross-tool deal memory (P1) — what was researched, said, and promised across every meeting on a deal — cannot be built inside a single CRM's data model.
+
+**Acknowledged trade-offs (and mitigations):**
+
+| Risk of standalone | Mitigation |
+|--------------------|------------|
+| "Yet another tool" adoption fatigue | Calendar auto-trigger (FR-P0-08) pushes briefs to the rep; app comes to the user |
+| Enterprise procurement friction (no SSO/SOC 2 in MVP) | Beachhead is mid-market HubSpot teams (5–50 reps) with lighter procurement; SSO/SOC 2 in Phase 3 |
+| Platform bundling of "good enough" native AI | Differentiate on cross-tool orchestration, custom battlecards, multi-CRM reach |
+| New vendor data-trust concerns | Draft-only mode, read-only CRM, PII redaction, citations, audit logs (Section 5) |
+
+**Strategic posture:** own the orchestration backend ("the brain"), stay flexible on the surface ("the face"). The crew runs as a headless backend behind an API; the chat web app is the first surface. Post-MVP, embedded surfaces (HubSpot sidebar widget, Slack bot) can be added without rebuilding the orchestration layer.
 
 **Key differentiators vs. incumbents:**
 
@@ -224,8 +291,9 @@ Sales Manager (coordinator)
 
 | System | MVP Scope | Priority |
 |--------|-----------|----------|
-| HubSpot CRM | Read contacts, deals, activities; draft note output | P0 (default; SF alternate) |
-| Google Calendar / MS Graph | Read upcoming meetings, attendees | P0 #1 (Sprint 3) |
+| HubSpot CRM | Read contacts, deals, activities; draft note output | P0 (**confirmed primary** — see Decisions; SF is Phase 3 port) |
+| Google Calendar | Read upcoming meetings, attendees | P0 #1 (Sprint 3; primary — pairs with HubSpot/Google Workspace ICP) |
+| MS Graph (Outlook calendar) | Read upcoming meetings, attendees | Deferred — post-MVP |
 | Web search / enrichment | Account research | P0 #2 (stub acceptable Sprint 1) |
 | Battlecard KB | Competitive intel RAG | P0 #3 |
 | Gong / Chorus | Live CI | P2 — deferred |
@@ -425,50 +493,7 @@ Traceability: MRD-v2 P0 #1–7
 
 ### Application Diagram Overview
 
-The product is a **new, standalone web application** with a chat-first UI — not a CRM plugin. Existing tools (HubSpot, calendar, web/enrichment, battlecard KB) are **read-only data sources** in the MVP. The AE copies approved outputs back into email and CRM manually until approve-and-commit writes ship in Phase 3.
-
-**System overview:**
-
-```mermaid
-flowchart TB
-    subgraph USER["AE's Experience (what the rep sees)"]
-        UI["Standalone Web App — Chat UI<br/>(new system, own browser tab)"]
-        CARDS["Output Cards:<br/>Pre-meeting Brief | Post-meeting Summary<br/>Email Draft | CRM Draft"]
-        APPROVE["Approve / Edit / Reject buttons"]
-        UI --> CARDS --> APPROVE
-    end
-
-    subgraph CREW["CrewAI Backend (invisible to user)"]
-        SM["Sales Manager Agent<br/>(coordinator)"]
-        PR["Prospect<br/>Research"]
-        CI["Competitive<br/>Intel"]
-        MP["Meeting<br/>Prep"]
-        MI["Meeting<br/>Insights"]
-        FU["Follow-Up"]
-        SM --> PR
-        SM --> CI
-        SM --> MP
-        SM --> MI
-        SM --> FU
-    end
-
-    subgraph TOOLS["Existing Tools (read-only in MVP)"]
-        CRM["HubSpot CRM<br/>contacts, deals, history"]
-        CAL["Google Calendar<br/>upcoming meetings"]
-        WEB["Web Search /<br/>Enrichment"]
-        KB["Battlecard<br/>Knowledge Base"]
-    end
-
-    UI -->|"trigger: 'prep me for 2pm with Acme'"| SM
-    PR -.reads.-> CRM
-    PR -.reads.-> WEB
-    CI -.reads.-> KB
-    CI -.reads.-> WEB
-    SM -.reads.-> CAL
-    FU -.reads.-> CRM
-
-    APPROVE -->|"AE copies approved email & CRM note<br/>back into their tools manually (MVP)"| CRM
-```
+See **Section 1 → Solution Overview → Deployment Model** for the full application overview diagram (standalone chat app + CrewAI backend + read-only tool integrations) and the standalone-vs-CRM-native rationale.
 
 **Meeting lifecycle flow (single meeting):**
 
@@ -690,10 +715,31 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 
 ---
 
+## Decisions
+
+**D1 — HubSpot is the primary CRM and initial target user base (confirmed 2026-06-09).**
+
+- **Decision:** Build the MVP and go-to-market exclusively against HubSpot. Salesforce is a documented Phase 3 port (keep the CRM adapter interface clean; spend zero capstone effort on SF).
+- **Rationale:**
+  - HubSpot's center of gravity is mid-market B2B SaaS (5–50 rep teams) — exact match to the PRD's primary segment.
+  - Lighter procurement (founder/VP-Sales-led buying vs. enterprise security committees); a draft-only, read-only tool can be adopted without a long security cycle.
+  - HubSpot's native AI (Breeze) is materially behind Salesforce Agentforce in agentic depth — longer competitive window before "good enough native" bundling.
+  - Simpler API surface and lighter marketplace listing process than AppExchange for the post-MVP embedded surface.
+- **Cascading implications:**
+  - CRM draft card (FR-P0-07) outputs fields mapping 1:1 to HubSpot properties (deal stage, next step, close date).
+  - CRM tool layer built against HubSpot object model: Contacts, Companies, Deals, Engagements/Notes.
+  - Distribution channel: HubSpot user communities, agency partners, and eventually a HubSpot App Marketplace listing.
+
+**D2 — Google Calendar is the primary calendar integration (follows from D1).**
+
+- HubSpot mid-market predominantly runs Google Workspace; FR-P0-08 targets Google Calendar. MS Graph/Outlook deferred to post-MVP.
+
+---
+
 ## Assumptions
 
 1. **Runtime:** `AAMAD_TARGET_RUNTIME=crewai` for all implementation epics.
-2. **CRM default:** HubSpot sandbox for MVP (Salesforce documented as alternate).
+2. **CRM default:** HubSpot sandbox for MVP — confirmed as primary (see Decisions D1); Salesforce deferred to Phase 3.
 3. **Sprint 1 trigger:** Manual meeting input acceptable before calendar integration (FR-P0-01 before FR-P0-08).
 4. **Transcript input:** Pasted text or mock transcript for FR-P0-05; no Gong in MVP.
 5. **CRM writes:** Draft-only through capstone demo; approve-and-commit is post-MVP.
@@ -704,7 +750,7 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 
 ## Open Questions
 
-1. Confirm HubSpot vs. Salesforce as primary CRM for capstone build.
+1. ~~Confirm HubSpot vs. Salesforce as primary CRM for capstone build.~~ **Resolved — see Decisions D1 (HubSpot confirmed).**
 2. Confirm manual trigger sufficient for Sprint 1 demo acceptance.
 3. Minimum HubSpot fields for CRM draft schema (deal stage, next step, close date — confirm with stakeholder).
 4. Should capstone demo use synthetic account data exclusively, or connect to live sandbox?
@@ -716,9 +762,9 @@ Deliverables: CrewAI crew (`config/agents.yaml`, `config/tasks.yaml`, `crew.py`)
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-06-09T22:29:00-05:00 |
+| Timestamp | 2026-06-09T22:44:00-05:00 |
 | Persona | @product-mgr |
-| Action | create-prd → update-v1.1-revenue-kpis → update-v1.2-application-diagram-overview |
+| Action | create-prd → update-v1.1-revenue-kpis → update-v1.2-application-diagram-overview → update-v1.3-standalone-deployment-model → update-v1.4-hubspot-first-decision |
 | Template | `.cursor/templates/prd-template.md` |
 | Input | `project-context/1.define/MRD-v2.md`, `mrd.md` |
 | Output Path | `project-context/1.define/prd-v1.md` |
